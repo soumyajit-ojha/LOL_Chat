@@ -23,4 +23,4 @@ https://github.com/soumyajit-ojha/LOL_Chat.git``
 
 2. **Navigate to the project directory:**
 ``bash
-cd lol_chat``
+cd backend``
