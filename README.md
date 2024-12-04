@@ -1,6 +1,6 @@
-# LOL_Chat - A Chat Application Built with Django
+# Po_Chat - A Chat Application Built with Django
 
-LOL_Chat is a real-time chat application designed and developed using the Django framework. It aims to provide a smooth, secure, and engaging communication platform for users. Whether you're building a small-scale social chat app or integrating chat features into larger projects, LOL_Chat offers a solid foundation to get started.
+Po_Chat is a real-time chat application designed and developed using the Django framework. It aims to provide a smooth, secure, and engaging communication platform for users. Whether you're building a small-scale social chat app or integrating chat features into larger projects, LOL_Chat offers a solid foundation to get started.
 
 ## Features
 - **User Authentication:** Secure user registration, login, and profile management.
