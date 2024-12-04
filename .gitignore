@@ -1,0 +1,5 @@
+.venv/
+static_cdn/
+__pycache__/
+migrations/
+.env
