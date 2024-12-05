@@ -19,7 +19,7 @@ Po_Chat is a real-time chat application designed and developed using the Django 
 ## How to Use
 1. **Clone the repository:**
 ``bash
-https://github.com/soumyajit-ojha/LOL_Chat.git``
+https://github.com/soumyajit-ojha/Po_Chat.git``
 
 2. **Navigate to the project directory:**
 ``bash
