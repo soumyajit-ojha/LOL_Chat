@@ -1,4 +1,5 @@
 from pathlib import Path
+from os import path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -44,7 +45,7 @@ ROOT_URLCONF = 'pochat.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [path.join(BASE_DIR, "frontend/templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,7 +107,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [path.join(BASE_DIR, 'frontend/static')]
+STATIC_ROOT = path.join(BASE_DIR, 'static_cdn')
 
+
+# Media files Configuration 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = path.join(BASE_DIR, 'mrdia_cdn')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
