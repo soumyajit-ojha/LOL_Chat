@@ -3,4 +3,3 @@ static_cdn/
 __pycache__/
 migrations/
 .env
-db.sqlite3
