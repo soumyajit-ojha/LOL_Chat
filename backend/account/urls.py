@@ -6,6 +6,7 @@ from .views import (
     registration_view,
     login_view,
     logout_view,
+    account_view,
 )
 
 
@@ -13,6 +14,8 @@ urlpatterns = [
     path('register-user/', registration_view, name='register'),
     path('signin-user/', login_view, name='login'),
     path('logout-user/', logout_view, name='logout'),
+    path('account/<user_id>/', account_view, name='account'),
+    # path('search/', search_people, name='search'),
 ]
 
 if settings.DEBUG:
