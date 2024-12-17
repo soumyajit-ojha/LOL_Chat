@@ -36,3 +36,34 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={'placeholder': 'Enter your password'}),
         required=True
     )
+
+    
+class AccountUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Account
+        fields = ('profile_image', 'email', 'username', 'hide_email')
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower()
+        # Exclude the current user while checking for duplicates
+        if Account.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(f"Email {email} is already in use.")
+        return email
+
+    def clean_username(self):
+        username = self.cleaned_data['username'].lower()
+        # Exclude the current user while checking for duplicates
+        if Account.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(f"Username {username} is already in use.")
+        return username
+
+    def save(self, commit=True):
+        account = super(AccountUpdateForm, self).save(commit=False)
+        account.username = self.cleaned_data['username']
+        account.email = self.cleaned_data['email']
+        account.profile_image = self.cleaned_data['profile_image']
+        account.hide_email = self.cleaned_data['hide_email']
+        if commit:
+            account.save()
+        return account
+

@@ -1,4 +1,5 @@
 from pathlib import Path
+from decouple import config
 from os import path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -14,8 +15,12 @@ SECRET_KEY = 'django-insecure-@ln@88$gqsr*_4^$$i%-qs%30_*159i+rnm5(0l#z$cipvltaw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Only for development.
 ALLOWED_HOSTS = []
 
+# For Custom User auth Model.
+AUTH_USER_MODEL = "account.Account"
 
 # Application definition
 
@@ -67,8 +72,12 @@ WSGI_APPLICATION = 'pochat.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config("MYSQL_DB"),
+        'USER': config("MYSQL_USER"),
+        'PASSWORD': config("MYSQL_PASS"),
+        'HOST': config("MYSQL_HOST"),
+        'PORT': int(config("MYSQL_PORT"))
     }
 }
 
@@ -114,7 +123,11 @@ STATIC_ROOT = path.join(BASE_DIR, 'static_cdn')
 
 # Media files Configuration 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = path.join(BASE_DIR, 'mrdia_cdn')
+MEDIA_ROOT = path.join(BASE_DIR, 'media_cdn')
+
+BASE_URL = "http://127.0.0.1:8000"
+MAX_PHOTO_SIZE = 5242880 # 5 * 1024 * 1025 ( 5 MB)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

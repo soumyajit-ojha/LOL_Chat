@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %} 
+    <link rel="stylesheet" href="{% static 'css/account/search_results.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="card p-2">
+        {% if accounts %}
+            <div class="d-flex flex-wrap">
+                {% for account in accounts %}
+                    <div class="card flex-row p-2 mx-2 my-2 align-items-center">
+                        <a class="profile-link d-flex align-items-center" href="{% url 'account' user_id=account.0.id %}">
+                            <div class="card-image m-2">
+                                <img class="img-fluid profile-image" src="{{ account.0.profile_image.url }}" alt="">
+                            </div>
+                            <div class="px-2">
+                                <h4 class="card-title">{{ account.0.username }}</h4>
+                                {% if account.1 %}
+                                    <p><a href="#" onclick="createOrReturnPrivateChat('{{ account.0.id }}')">Send a Message</a></p>
+                                {% endif %}
+                            </div>
+                        </a>
+                        <div class="d-flex flex-grow-1 justify-content-end mx-2">
+                            {% if account.1 %}
+                                <div class="border rounded p-3">
+                                    <p class="friends-text m-auto">Friends</p>
+                                    <span class="material-icons checkmark-icon">check_circle_outline</span>
+                                </div>
+                            {% elif account.0 != request.user %}
+                                <div class="border rounded p-3">
+                                    <p class="friends-text m-auto">Not Friends</p>
+                                    <span class="material-icons cancel-icon">cancel</span>
+                                </div>
+                            {% else %}
+                                <div class="border rounded p-3">
+                                    <p class="friends-text m-auto">This is you</p>
+                                    <span class="material-icons">person_pin</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center">
+                <p>No results found. Try refining your search.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock content %}
