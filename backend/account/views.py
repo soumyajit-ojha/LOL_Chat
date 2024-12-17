@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
-from account.forms import RegistrationForm, LoginForm
+from account.forms import RegistrationForm, LoginForm, AccountUpdateForm
 from . models import Account
 from django.conf import settings
 from django.db.models import Q
@@ -90,8 +90,39 @@ def account_view(request, *args, **kwargs):
     else:
         return redirect("login")
 
-# Search friends
+# Edit account
+def edit_account_view(request, *args, **kwargs):
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return redirect('login')
 
+    user_id = kwargs.get('user_id')
+
+    # Check if the account exists
+    try:
+        account = Account.objects.get(pk=user_id)
+    except Account.DoesNotExist:
+        return HttpResponse("Something went wrong.", status=404)
+
+    # Prevent editing someone else's account
+    if account.pk != request.user.pk:
+        return HttpResponse("You can't edit someone else's account.", status=403)
+
+    context = {}
+    if request.method == "POST":
+        form = AccountUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('account', user_id=account.pk)
+    else:
+        form = AccountUpdateForm(instance=request.user)
+
+    context["form"] = form
+    context["MAX_PHOTO_SIZE"] = settings.MAX_PHOTO_SIZE
+
+    return render(request, 'account/edit_account.html', context=context)
+
+# Search friends
 def account_search_view(request, *args, **kwargs):
     context = {}
     print("view called")
