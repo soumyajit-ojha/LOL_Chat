@@ -4,7 +4,11 @@ from django.http import HttpResponse
 from account.forms import RegistrationForm, LoginForm, AccountUpdateForm
 from . models import Account
 from django.conf import settings
-from django.db.models import Q
+
+# For Image cropping
+from django.http import JsonResponse
+from django.core.files.base import ContentFile
+import base64
 
 
 def registration_view(request, *args, **kwargs):
@@ -112,8 +116,13 @@ def edit_account_view(request, *args, **kwargs):
     if request.method == "POST":
         form = AccountUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
+            # Delete the old profile image if a new one is uploaded
+            if 'profile_image' in request.FILES:
+                account.profile_image.delete()
             form.save()
             return redirect('account', user_id=account.pk)
+        else:
+            context["form_errors"] = form.errors
     else:
         form = AccountUpdateForm(instance=request.user)
 
@@ -121,7 +130,6 @@ def edit_account_view(request, *args, **kwargs):
     context["MAX_PHOTO_SIZE"] = settings.MAX_PHOTO_SIZE
 
     return render(request, 'account/edit_account.html', context=context)
-
 # Search friends
 def account_search_view(request, *args, **kwargs):
     context = {}
@@ -145,3 +153,29 @@ def account_search_view(request, *args, **kwargs):
                 context['accounts'] = accounts
     # return HttpResponse("Data found")            
     return render(request, "account/search_results.html", context)
+
+# Image cropping view
+def upload_cropped_image(request):
+    if request.method == "POST":
+        try:
+            # Decode base64 image data
+            data_url = request.POST.get('image')
+            if not data_url:
+                return JsonResponse({"success": False, "error": "No image data provided."}, status=400)
+            
+            format, imgstr = data_url.split(';base64,')  # Split metadata and image data
+            ext = format.split('/')[-1]  # Get file extension
+            image_data = ContentFile(base64.b64decode(imgstr), name=f"cropped_image.{ext}")
+
+            # Save the image to the user's account
+            account = request.user
+            if account.profile_image:
+                account.profile_image.delete()  # Delete the old image
+            account.profile_image.save(image_data.name, image_data)
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            print("ERROR--",e)
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
