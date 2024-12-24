@@ -3,4 +3,4 @@ static_cdn/
 __pycache__/
 migrations/
 .env
-media_cdn\profile_image
+media_cdn/profile_image/
