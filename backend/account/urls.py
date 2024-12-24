@@ -9,6 +9,7 @@ from .views import (
     account_view,
     account_search_view,
     edit_account_view,
+    upload_cropped_image,
 )
 
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path('account/<user_id>/', account_view, name='account'),
     path('<int:user_id>/account/', edit_account_view, name='edit_account'),
     path("search/", account_search_view, name="account_search"),
+    path("upload-cropped-image/", upload_cropped_image, name="crop_image"),
 ]
 
 if settings.DEBUG:
