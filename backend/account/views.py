@@ -10,6 +10,10 @@ from django.http import JsonResponse
 from django.core.files.base import ContentFile
 import base64
 
+# For friend systems
+from friend.models import FriendList, FriendRequest
+from friend.friend_request_status import FriendRequestStatus
+from friend.utils import get_friend_request_or_not
 
 def registration_view(request, *args, **kwargs):
     user = request.user
@@ -72,24 +76,60 @@ def account_view(request, *args, **kwargs):
     except:
         HttpResponse("<h3 class = text-center> Something went wrong.</h3>")
     if account:
-        context['user_id'] = account.id
-        context["username"] = account.username
-        context["email"] = account.email
-        context["profile_image"] = account.profile_image.url
-        context["hide_email"] = account.hide_email
+        context['user_id']          = account.id
+        context["username"]         = account.username
+        context["email"]            = account.email
+        context["profile_image"]    = account.profile_image.url
+        context["hide_email"]       = account.hide_email
+
+        try:
+            friend_list = FriendList.objects.get(user=account)
+        except:
+            friend_list = FriendList.objects.create(user=account)
+
+        friends = friend_list.friends.all()
+        context['friends'] = friends
+        
 
         # define template variable for is_self and is_friend
-        is_self = True
-        is_friend = False
-        user = request.user
+        is_self         = True
+        is_friend       = False
+        request_sent    = FriendRequestStatus.NO_REQUEST_SENT.value
+        friend_requests = None
+        user            = request.user
+
+        # Check for self account ! 
         if user.is_authenticated and user != account:
             is_self = False
+
+            # Check either if friends
+            if friends.filter(pk=user.id):
+                is_friend = True
+
+            else:
+                is_friend = False
+                
+                # CASE-1: Request sent from them to you. (FriendRequestStatus.THEM_SENT_TO_YOU.value)
+                if get_friend_request_or_not(sender=account, receiver=user) != False:
+                    request_sent = FriendRequestStatus.THEM_SENT_TO_YOU.value
+                    context['pending_friend_request_id'] = get_friend_request_or_not(sender=account, receiver=user).id
+
+                # CASE-2: Request has been sent by You to them. (FriendRequestStatus.YOU_SENT_TO_THEM.value)
+                elif get_friend_request_or_not(sender=account, receiver=user) != False:
+                    request_sent = FriendRequestStatus.YOU_SENT_TO_THEM.value
+
+                # CASE-3: No requests sent. (FriendRequestStatus.NO_REQUEST_SENT.value)
+                else:
+                    request_sent = FriendRequestStatus.NO_REQUEST_SENT.value
+
+                
         elif not user.is_authenticated:
             is_self = False
-        context['is_self'] = is_self
-        context['is_friend'] = is_friend
-        context['BASE_URL'] = settings.BASE_URL
-    
+        context['is_self']      = is_self
+        context['is_friend']    = is_friend
+        context['BASE_URL']     = settings.BASE_URL
+        context['friend_requests']     = friend_requests
+        context['request_sent']     = request_sent
         return render(request, 'account/account.html', context=context)
     else:
         return redirect("login")
@@ -126,8 +166,8 @@ def edit_account_view(request, *args, **kwargs):
     else:
         form = AccountUpdateForm(instance=request.user)
 
-    context["form"] = form
-    context["MAX_PHOTO_SIZE"] = settings.MAX_PHOTO_SIZE
+    context["form"]             = form
+    context["MAX_PHOTO_SIZE"]   = settings.MAX_PHOTO_SIZE
 
     return render(request, 'account/edit_account.html', context=context)
 # Search friends
