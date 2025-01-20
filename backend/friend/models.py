@@ -40,6 +40,7 @@ class FriendList(models.Model):
 		removee_friend_list = FriendList.objects.get(user=removee)
 		# Removing himself from removee friendlist
 		removee_friend_list.remove_friend(self.user)
+		
 	def is_mutual_friend(self, friend):
 		if friend in self.friends.all():
 			return True
@@ -85,7 +86,7 @@ class FriendRequest(models.Model):
 	def decline(self):
 		"""
 		Decline a friend request.
-		It is 'Declined by a setting 'is_active' field to False
+		It is 'Declined by a setting 'is_active' field to False. --Done by receiver
 		"""
 		self.is_active = False
 		self.save()
@@ -93,7 +94,7 @@ class FriendRequest(models.Model):
 	def cancel(self):
 		"""
 		Cancel a friend request.
-		It is 'Canceld' by a setting 'is_active' field to False
+		It is 'Canceld' by a setting 'is_active' field to False. --Done by sender.
 		The only different with respect to "declining" through the notification that is generated. 
 		"""
 		self.is_active = False
