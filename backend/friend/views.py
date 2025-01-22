@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import FriendRequest
 from account.models import Account
-
+from .utils import get_friend_request
 
 class SendFriendRequest(View):
     def post(self, request, *args, **kwargs):
@@ -33,3 +33,23 @@ class SendFriendRequest(View):
         except Exception as e:
             print(e)
             return JsonResponse({'message': str(e)}, status=500)
+
+class AllFriendRequest(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        context = {}
+
+        if not user.is_authenticated:
+            return redirect("login")
+        account_id = kwargs.get('user_id')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponse({"message":"Account doesn't exist"}, status=404)
+        if user != account:
+            HttpResponse({"message":"You can't see others friends"}, status=403)
+
+        context["friend_requests"] = get_friend_request(user=user)
+
+        return render(request, "friend/friend_requests.html", context)
+        
