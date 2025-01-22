@@ -2,23 +2,13 @@ from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 import base64
 
-from friend.models import FriendList, FriendRequest
+from friend.models import FriendList
 from .models import Account
 
 
-# Utility to get friend request status
-def get_friend_request_status(sender, receiver):
-    """
-    Returns the status of a friend request between sender and receiver.
-    """
-    try:
-        friend_request = FriendRequest.objects.get(sender=sender, receiver=receiver)
-        return friend_request
-    except FriendRequest.DoesNotExist:
-        return False
 
 # Utility to fetch account details
-def fetch_account_details(user_id):
+def fetch_account_details(request, user_id):
     """
     Fetch account details and friend list for the given user ID.
     """
@@ -56,10 +46,5 @@ def search_accounts(query):
     if not query or len(query) > 100:
         return None, "Invalid search query. Query is either empty or too long."
 
-    search_results = Account.objects.filter(
-        email__icontains=query
-    ).filter(
-        username__icontains=query
-    ).distinct()
-
+    search_results = Account.objects.filter(username__icontains=query, email__icontains=query).distinct()
     return search_results, None
