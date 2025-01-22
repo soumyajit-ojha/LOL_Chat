@@ -1,10 +1,14 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import SendFriendRequest
+from .views import (
+    SendFriendRequest,
+    AllFriendRequest,
+)
 
 urlpatterns = [
     path('friend_request/', SendFriendRequest.as_view(), name='friend-request-sent'),
+    path('friend_request/<int:user_id>', AllFriendRequest.as_view(), name='friend-request'),
 ]
 
 if settings.DEBUG:
