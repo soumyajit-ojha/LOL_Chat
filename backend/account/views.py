@@ -4,12 +4,12 @@ from django.http import HttpResponse, JsonResponse
 from account.forms import RegistrationForm, LoginForm, AccountUpdateForm
 from django.conf import settings
 from friend.friend_request_status import FriendRequestStatus
+from friend.models import FriendRequest
 from .models import Account
 
-
 # Import utilities
-from .utils import get_friend_request_status, fetch_account_details, handle_image_upload, search_accounts
-
+from .utils import fetch_account_details, handle_image_upload, search_accounts
+from friend.utils import get_friend_request, get_friend_request_status
 
 
 def registration_view(request, *args, **kwargs):
@@ -63,10 +63,11 @@ def login_view(request):
 
 
 def account_view(request, *args, **kwargs):
-    user_id = kwargs.get("user_id")
-    account, friend_list = fetch_account_details(user_id)
+    user = request.user
+    receiver_user_id = kwargs.get("user_id")
+    account, friend_list = fetch_account_details(request, receiver_user_id)
     friends = friend_list.friends.all()
-
+    
     context = {
         "user_id": account.id,
         "username": account.username,
@@ -74,17 +75,19 @@ def account_view(request, *args, **kwargs):
         "profile_image": account.profile_image.url,
         "hide_email": account.hide_email,
         "friends": friends,
-        "is_self": request.user == account,
-        "is_friend": friends.filter(pk=request.user.id).exists(),
+        "is_self": user == account,
+        "is_friend": friends.filter(pk=user.id).exists(),
         "BASE_URL": settings.BASE_URL,
+        "request_sent" : None,
+        "friend_requests" : get_friend_request(user),
     }
 
-    if request.user.is_authenticated and request.user != account:
-        friend_request = get_friend_request_status(sender=account, receiver=request.user)
-        if friend_request:
-            context['request_sent'] = FriendRequestStatus.THEM_SENT_TO_YOU.value if friend_request.sender == account else FriendRequestStatus.YOU_SENT_TO_THEM.value
-        else:
-            context['request_sent'] = FriendRequestStatus.NO_REQUEST_SENT.value
+    if user.is_authenticated and user != account:
+        if get_friend_request_status(sender=account, receiver=user) :
+            context['request_sent'] = FriendRequestStatus.THEM_SENT_TO_YOU.value
+
+        elif get_friend_request_status(sender=user, receiver=account) :
+            context['request_sent'] = FriendRequestStatus.YOU_SENT_TO_THEM.value    
 
     return render(request, 'account/account.html', context=context)
 
@@ -131,8 +134,6 @@ def upload_cropped_image(request):
             return JsonResponse({"success": False, "error": str(e)}, status=500)
 
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
-
-from .utils import search_accounts
 
 def account_search_view(request, *args, **kwargs):
     context = {}
