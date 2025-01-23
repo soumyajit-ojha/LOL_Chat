@@ -53,3 +53,30 @@ class AllFriendRequest(View):
 
         return render(request, "friend/friend_requests.html", context)
         
+class AcceptFriendRequest(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        if not user.is_authenticated:
+            return JsonResponse({"message" : "You have no access for this action."}, status=403)
+        
+        friend_request_id = kwargs.get("friend_request_id")
+        try:
+            friend_request = FriendRequest.objects.get(pk=friend_request_id)
+            print("FRIEND REQUEST:", friend_request)
+
+        except FriendRequest.DoesNotExist:
+            JsonResponse({"message" : "Friend request doesn't found."}, status=404)
+
+        except Exception as e:
+            print(f"DEBUG : exception raise - {str(e)}")
+            return JsonResponse({"message":"Failed to accept."})
+
+        if friend_request.receiver != user:
+            JsonResponse({"message" : "You have no access to do this action."}, status=403)
+        try:
+            friend_request.accept()
+            return JsonResponse({"message" : "Accepter Successfully."})
+        except Exception as e:
+            print(f"DEBUG : exception raise - {str(e)}")
+            return JsonResponse({"message" : "error raise"}, status=500)
