@@ -78,7 +78,7 @@ def account_view(request, *args, **kwargs):
         "is_self": user == account,
         "is_friend": friends.filter(pk=user.id).exists(),
         "BASE_URL": settings.BASE_URL,
-        "request_sent" : None,
+        "request_sent" : FriendRequestStatus.NO_REQUEST_SENT.value,
         "friend_requests" : get_friend_request(user),
     }
 
