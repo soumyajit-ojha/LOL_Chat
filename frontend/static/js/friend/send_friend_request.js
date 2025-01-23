@@ -48,6 +48,9 @@ function cancelFriendRequest(id, uiUpdateFunction) {
         success: function (data) {
             console.log(data.message);
             // Revert the button back to "Send Friend Request"
+            if(uiUpdateFunction){
+                uiUpdateFunction();
+            }
             const sendFriendRequestBtn = document.getElementById("id_send_friend_request_btn");
             if (sendFriendRequestBtn) {
                 sendFriendRequestBtn.classList.remove("btn-danger");
