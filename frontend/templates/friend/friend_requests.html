@@ -16,7 +16,7 @@
             <div class="card flex-row flex-grow-1 p-2 mx-2 my-2 align-items-center">
                 <a class="profile-link" href="{% url 'account' user_id=request.sender.id %}">
                     <div class="card-image m-2">
-                        <img class="img-fluid profile-image" src="{{request.sender.profile_image.url}}" alt="">
+                        <img class="img-fluid profile-image" src="{{request.sender.profile_image.url}}" alt="account-profile-img">
                     </div>
                 </a>
                 <a class="profile-link" href="{% url 'account' user_id=request.sender.id %}">
@@ -28,7 +28,7 @@
                     <span id="id_cancel_{{request.sender.id}}" class="decline-friend-request material-icons p-1"
                         onclick='triggerDeclineFriendRequest("{{request.id}}")'>cancel</span>
                     <span id="id_confirm_{{request.sender.id}}" class="confirm-friend-request material-icons p-1"
-                        onclick='triggerAcceptFriendRequest("{{request.id}}")'>check</span>
+                        onclick='triggerAcceptFriendRequest("{{request.id}}")'>check {{request.id}}</span>
                 </div>
             </div>
             {% if forloop.counter|divisibleby:2 %}
@@ -59,7 +59,7 @@
     }
 
     function triggerAcceptFriendRequest(friend_request_id) {
-        // acceptFriendRequest(friend_request_id, onFriendRequestAccepted)
+        acceptFriendRequest(friend_request_id, onFriendRequestAccepted)
     }
 
     function triggerDeclineFriendRequest(friend_request_id) {
@@ -67,7 +67,7 @@
     }
 </script>
 
-
+<script src="{% static 'js/friend/accept_friend_request.js' %}"></script>
 
 
 {% endblock content %}
