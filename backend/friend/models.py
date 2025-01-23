@@ -70,7 +70,7 @@ class FriendRequest(models.Model):
 
 		if not self.is_active:
 			raise ValueError("This friend request is already inactive.")
-		with transaction.atomic:
+		with transaction.atomic():
 			try:
 				receiver_friend_list, _ = FriendList.objects.get_or_create(user = self.receiver)
 				sender_friend_list, _ 	= FriendList.objects.get_or_create(user = self.sender)
@@ -79,9 +79,12 @@ class FriendRequest(models.Model):
 					receiver_friend_list.add_friend(self.sender)
 				if sender_friend_list:
 					sender_friend_list.add_friend(self.receiver)
+
 					self.is_active = False
 					self.save()
+
 			except Exception as e:
+				print(f"DEBUG : exception raise - {str(e)}")
 				raise RuntimeError(f"An error occureed while accepting a friend request: {e}")
 	def decline(self):
 		"""
