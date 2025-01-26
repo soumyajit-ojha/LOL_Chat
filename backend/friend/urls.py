@@ -5,12 +5,14 @@ from .views import (
     SendFriendRequest,
     AllFriendRequest,
     AcceptFriendRequest,
+    Unfriend,
 )
 
 urlpatterns = [
-    path('friend_request/', SendFriendRequest.as_view(), name='friend-request-sent'),
+    path('friend_request_sent/', SendFriendRequest.as_view(), name='friend-request-sent'),
     path('friend_request/<int:user_id>', AllFriendRequest.as_view(), name='friend-request'),
     path('accept_friend_request/<int:friend_request_id>', AcceptFriendRequest.as_view(), name='friend-request-accept'),
+    path('unfriend/', Unfriend.as_view(), name='unfriend')
 ]
 
 if settings.DEBUG:
