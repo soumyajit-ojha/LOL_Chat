@@ -81,7 +81,7 @@
 						<button class="btn btn-secondary dropdown-toggle friends-btn" type="button" id="id_friends_toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						Friends
 						</button>
-						<div class="dropdown-menu" aria-labelledby="id_friends_toggle">
+						<div class="dropdown-menu" aria-labelledby="id_friends_toggle" id="id_unfriend_btn">
 							<a class="dropdown-item" href="#" onclick="removeFriend('{{user_id}}', onFriendRemoved)">Unfriend</a>
 						</div>
 					</div>
@@ -184,11 +184,13 @@
 	}
 	
 </script>
-<script src="{% static 'js/friend/send_friend_request.js' %}"></script>
-<script src="{% static 'js/friend/accept_friend_request.js' %}"></script>
 <script>
 	const csrfToken = "{{ csrf_token }}";
 </script>
+
+<script src="{% static 'js/friend/send_friend_request.js' %}"></script>
+<script src="{% static 'js/friend/accept_friend_request.js' %}"></script>
+<script src="{% static 'js/friend/unfriend.js' %}"></script>
 
 {#% include 'friend/snippets/accept_friend_request.html' %#}
 {#% include 'friend/snippets/decline_friend_request.html' %#}
