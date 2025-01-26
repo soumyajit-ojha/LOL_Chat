@@ -6,7 +6,7 @@ function sendFriendRequest(id, uiUpdateFunction) {
 
     $.ajax({
         type: "POST",
-        url: "/friend_request/",
+        url: "/friend_request_sent/",
         timeout: 5000,
         data: context,
         success: function (data) {
