@@ -1,24 +1,23 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.http import JsonResponse, HttpResponse
-from .models import FriendRequest
+from .models import FriendRequest, FriendList
 from account.models import Account
 from .utils import get_friend_request
 
 class SendFriendRequest(View):
     def post(self, request, *args, **kwargs):
         user = request.user
+
         if not user.is_authenticated:
             return JsonResponse({'message': 'You must be logged in to send a friend request.'}, status=401)
 
         user_id = request.POST.get('receiver_user_id')
-        print(user_id)
         if not user_id:
             return JsonResponse({'message': 'Unable to send request. Missing receiver ID.'}, status=400)
 
         try:
             receiver = Account.objects.get(pk=user_id)
-
             # Check for existing friend request
             if FriendRequest.objects.filter(sender=user, receiver=receiver, is_active=True).exists():
                 return JsonResponse({'message': 'You have already sent them a friend request.'}, status=400)
@@ -28,10 +27,8 @@ class SendFriendRequest(View):
             return JsonResponse({'message': 'Friend request sent successfully.'}, status=200)
 
         except Account.DoesNotExist:
-            print("Accout not found")
             return JsonResponse({'message': 'Account not found.'}, status=404)
         except Exception as e:
-            print(e)
             return JsonResponse({'message': str(e)}, status=500)
 
 class AllFriendRequest(View):
@@ -63,20 +60,52 @@ class AcceptFriendRequest(View):
         friend_request_id = kwargs.get("friend_request_id")
         try:
             friend_request = FriendRequest.objects.get(pk=friend_request_id)
-            print("FRIEND REQUEST:", friend_request)
+
 
         except FriendRequest.DoesNotExist:
-            JsonResponse({"message" : "Friend request doesn't found."}, status=404)
+            return JsonResponse({"message" : "Friend request doesn't found."}, status=404)
 
         except Exception as e:
-            print(f"DEBUG : exception raise - {str(e)}")
+
             return JsonResponse({"message":"Failed to accept."})
 
         if friend_request.receiver != user:
             JsonResponse({"message" : "You have no access to do this action."}, status=403)
         try:
             friend_request.accept()
-            return JsonResponse({"message" : "Accepter Successfully."})
+
+            return JsonResponse({"response": "Accepted successfully."})
         except Exception as e:
-            print(f"DEBUG : exception raise - {str(e)}")
-            return JsonResponse({"message" : "error raise"}, status=500)
+
+            return JsonResponse({"response": "Error occurred while accepting the request."}, status=500)
+
+class Unfriend(View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if not user.is_authenticated:
+            return JsonResponse({"response":"You need to be logged in to perform this action."}, status=403)
+
+        removee_id = request.POST.get('removee_id')
+        if not removee_id:
+            return JsonResponse({"response" : "Removee id not provided."}, status=400)
+
+        try:
+            removee = Account.objects.get(pk=removee_id)
+
+        except Account.DoesNotExist:
+            return JsonResponse({"response" : "User to unfriend doesn't exixt."}, status=404)
+        
+        except Exception as e:
+            return JsonResponse({'response' : f'Error found{str(e)}'}, status=400)
+        
+        try:
+            Own_friend_list = FriendList.objects.get(user=user)
+            Own_friend_list.unfriend(removee=removee)
+            return JsonResponse({'response' : f'Successfuly unfriend {removee.username}'}, status=200)
+        
+        except FriendList.DoesNotExist:
+            return JsonResponse({"response":"Friend list doesn't found for current user."})
+        
+        except Exception as e:
+            return JsonResponse({'response':f'Error found: {str(e)}'}, status=400)
