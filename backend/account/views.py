@@ -80,12 +80,14 @@ def account_view(request, *args, **kwargs):
         "BASE_URL": settings.BASE_URL,
         "request_sent" : FriendRequestStatus.NO_REQUEST_SENT.value,
         "friend_requests" : get_friend_request(user),
+        "pending_friend_request_id" : None
     }
 
     if user.is_authenticated and user != account:
         if get_friend_request_status(sender=account, receiver=user) :
             context['request_sent'] = FriendRequestStatus.THEM_SENT_TO_YOU.value
-
+            context['pending_friend_request_id'] = FriendRequest.objects.get(sender=account, receiver=user, is_active=True)
+            
         elif get_friend_request_status(sender=user, receiver=account) :
             context['request_sent'] = FriendRequestStatus.YOU_SENT_TO_THEM.value    
 
@@ -146,7 +148,7 @@ def account_search_view(request, *args, **kwargs):
             context['error'] = error
         else:
             user = request.user
-            accounts = []
+            accounts = [], # [(account_obj, is_friend), ....]
             if user.is_authenticated:
                 for account in search_results:
                     # Placeholder for mutual friend check if implemented
