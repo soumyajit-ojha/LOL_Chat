@@ -28,7 +28,7 @@
                     <span id="id_cancel_{{request.sender.id}}" class="decline-friend-request material-icons p-1"
                         onclick='triggerDeclineFriendRequest("{{request.id}}")'>cancel</span>
                     <span id="id_confirm_{{request.sender.id}}" class="confirm-friend-request material-icons p-1"
-                        onclick='triggerAcceptFriendRequest("{{request.id}}")'>check {{request.id}}</span>
+                        onclick='triggerAcceptFriendRequest("{{request.id}}")'>check</span>
                 </div>
             </div>
             {% if forloop.counter|divisibleby:2 %}
@@ -63,11 +63,12 @@
     }
 
     function triggerDeclineFriendRequest(friend_request_id) {
-        // declineFriendRequest(friend_request_id, onFriendRequestDeclined)
+        declineFriendRequest(friend_request_id, onFriendRequestDeclined)
     }
 </script>
 
 <script src="{% static 'js/friend/accept_friend_request.js' %}"></script>
+<script src="{% static 'js/friend/decline_friend_request.js' %}"></script>
 
 
 {% endblock content %}
