@@ -48,8 +48,8 @@
 			<div class="card m-2 p-4">
 				<div class="d-flex flex-row align-items-center">
 					<span class="friend-text align-items-center mr-2">Accept Friend Request</span>
-					<span id="id_cancel_{{user_id}}" class="decline-friend-request material-icons p-1" onclick='triggerDeclineFriendRequest("{{pending_friend_request_id}}")'>cancel</span>
-  					<span id="id_confirm_{{user_id}}" class="confirm-friend-request material-icons p-1" onclick='triggerAcceptFriendRequest("{{pending_friend_request_id}}")'>check</span>
+					<span id="id_cancel_{{user_id}}" class="decline-friend-request material-icons p-1" onclick='triggerDeclineFriendRequest("{{pending_friend_request_id.id}}")'>cancel</span>
+  					<span id="id_confirm_{{user_id}}" class="confirm-friend-request material-icons p-1" onclick='triggerAcceptFriendRequest("{{pending_friend_request_id.id}}")'>check</span>
 				</div>
 			</div>
 			{% endif %}
@@ -190,6 +190,7 @@
 
 <script src="{% static 'js/friend/send_friend_request.js' %}"></script>
 <script src="{% static 'js/friend/accept_friend_request.js' %}"></script>
+<script src="{% static 'js/friend/decline_friend_request.js' %}"></script>
 <script src="{% static 'js/friend/unfriend.js' %}"></script>
 
 {#% include 'friend/snippets/accept_friend_request.html' %#}
