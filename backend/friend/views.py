@@ -109,3 +109,22 @@ class Unfriend(View):
         
         except Exception as e:
             return JsonResponse({'response':f'Error found: {str(e)}'}, status=400)
+
+class DeclineFriendRequest(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({"response" : "You don't have permission to do this."}, status=403)
+        
+        friend_request_id = kwargs.get('friend_request_id')
+        if not friend_request_id:
+            return JsonResponse({"response" : "Friend request id missing."}, status=404)
+        try :
+            friend_request = FriendRequest.objects.get(pk=friend_request_id)
+            if friend_request.receiver != user:
+                return JsonResponse({"You are not authorized to decline requests."}, status=403)
+            friend_request.decline()
+            return JsonResponse({"response" : "Request declined."}, status=200)
+
+        except Exception as e:
+            return JsonResponse({"response" : f"Error raised: {str(e)}"}, status=200)
