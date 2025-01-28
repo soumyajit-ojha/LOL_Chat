@@ -128,3 +128,27 @@ class DeclineFriendRequest(View):
 
         except Exception as e:
             return JsonResponse({"response" : f"Error raised: {str(e)}"}, status=200)
+
+class CancelFriendRequest(View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({"response": "You must be logged in to cancel a friend request."}, status=403)
+
+        receiver_user_id = request.POST.get("receiver_user_id")
+        if not receiver_user_id:
+            return JsonResponse({"response": "Receiver user ID is required to cancel the friend request."}, status=400)
+
+        try:
+            receiver = Account.objects.get(pk=receiver_user_id)
+        except Account.DoesNotExist:
+            return JsonResponse({"response": "Receiver account not found."}, status=404)
+
+        # Retrieve active friend requests
+        friend_requests = FriendRequest.objects.filter(sender=user, receiver=receiver, is_active=True)
+        if not friend_requests.exists():
+            return JsonResponse({"response": "No active friend request found to cancel."}, status=404)
+        for friend_request in friend_requests:
+            print(friend_request.timestamp)
+            friend_request.cancel()
+        return JsonResponse({"response": "Friend request(s) canceled successfully."}, status=200)
