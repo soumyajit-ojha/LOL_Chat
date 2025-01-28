@@ -148,7 +148,7 @@ def account_search_view(request, *args, **kwargs):
             context['error'] = error
         else:
             user = request.user
-            accounts = [], # [(account_obj, is_friend), ....]
+            accounts = []       # [(account_obj, is_friend), ....]
             if user.is_authenticated:
                 for account in search_results:
                     # Placeholder for mutual friend check if implemented
