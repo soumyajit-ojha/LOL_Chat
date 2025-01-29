@@ -148,7 +148,8 @@ class CancelFriendRequest(View):
         friend_requests = FriendRequest.objects.filter(sender=user, receiver=receiver, is_active=True)
         if not friend_requests.exists():
             return JsonResponse({"response": "No active friend request found to cancel."}, status=404)
+        
         for friend_request in friend_requests:
-            print(friend_request.timestamp)
             friend_request.cancel()
+            
         return JsonResponse({"response": "Friend request(s) canceled successfully."}, status=200)

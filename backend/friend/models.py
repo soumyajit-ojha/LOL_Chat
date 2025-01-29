@@ -84,7 +84,6 @@ class FriendRequest(models.Model):
 					self.save()
 
 			except Exception as e:
-				print(f"DEBUG : exception raise - {str(e)}")
 				raise RuntimeError(f"An error occureed while accepting a friend request: {e}")
 	def decline(self):
 		"""
