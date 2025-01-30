@@ -5,6 +5,45 @@ from .models import FriendRequest, FriendList
 from account.models import Account
 from .utils import get_friend_request
 
+class AllFriends(View):
+    def get(self, request, *args, **kwargs):
+        # Authenticated User
+        user = request.user
+        user_id = kwargs.get("user_id")
+        context = {}
+
+        if not user.is_authenticated:
+            return JsonResponse({"response" : "You are not authenticated as a valid user."}, status=403)
+        if not user_id:
+            return JsonResponse({"response" : "User ID missing, must required."}, status=400)
+        
+        # this_account_holder = this user/ current_user
+        try:
+            current_user = Account.objects.get(pk=user_id) 
+            context['this_user'] = current_user
+        except Account.DoesNotExist:
+            return JsonResponse({"response":"Account no longer exist."}, status=404)
+        # friends of current user
+        try:
+            friends_list = FriendList.objects.get(user=current_user)
+        except FriendList.DoesNotExist:
+            return render(request, '404.html')
+            return JsonResponse({"response":"No Friends Found."}, status=404)
+
+        if user != current_user:
+            if not user in friends_list.friends.all():
+                return render(request, '403.html')
+                return JsonResponse({"response" : "You were not friends, you can's see."}, status=403)
+            
+        auth_user_friend_list = FriendList.objects.get(user=user)
+        # print(auth_user_friend_list)
+        friends = []
+        for friend in friends_list.friends.all():
+            friends.append((friend, auth_user_friend_list.is_mutual_friend(friend)))
+        context['friends'] = friends
+        
+        return render(request, "friend/friend_list.html", context)
+
 class SendFriendRequest(View):
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -151,5 +190,5 @@ class CancelFriendRequest(View):
         
         for friend_request in friend_requests:
             friend_request.cancel()
-            
+
         return JsonResponse({"response": "Friend request(s) canceled successfully."}, status=200)
