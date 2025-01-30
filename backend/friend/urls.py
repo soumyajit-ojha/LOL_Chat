@@ -8,6 +8,7 @@ from .views import (
     DeclineFriendRequest,
     Unfriend,
     CancelFriendRequest,
+    AllFriends,
 )
 
 urlpatterns = [
@@ -16,7 +17,8 @@ urlpatterns = [
     path('accept_friend_request/<int:friend_request_id>', AcceptFriendRequest.as_view(), name='friend-request-accept'),
     path('cancel_friend_request/', CancelFriendRequest.as_view(), name='friend-request-decline'),
     path('decline_friend_request/<int:friend_request_id>', DeclineFriendRequest.as_view(), name='friend-request-decline'),
-    path('unfriend/', Unfriend.as_view(), name='unfriend')
+    path('unfriend/', Unfriend.as_view(), name='unfriend'),
+    path('all_friends/<int:user_id>', AllFriends.as_view(), name='all-friends'),
 ]
 
 if settings.DEBUG:
