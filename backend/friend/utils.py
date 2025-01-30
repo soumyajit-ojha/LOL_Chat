@@ -17,4 +17,7 @@ def get_friend_request(user, *args, **kwargs):
         all_requests = FriendRequest.objects.filter(receiver=user, is_active=True)
     except FriendRequest.DoesNotExist:
         all_requests = None
+    except Exception as e:
+        all_requests = None
+
     return all_requests
