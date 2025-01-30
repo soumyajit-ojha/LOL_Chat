@@ -42,9 +42,11 @@ class FriendList(models.Model):
 		removee_friend_list.remove_friend(self.user)
 		
 	def is_mutual_friend(self, friend):
-		if friend in self.friends.all():
-			return True
-		return False
+		try:
+			friend_list = FriendList.objects.get(user=friend)
+			return self.user in friend_list.friends.all() and friend in self.friends.all()
+		except FriendList.DoesNotExist:
+			return False
 
 
 class FriendRequest(models.Model):
