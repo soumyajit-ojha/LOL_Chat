@@ -13,7 +13,7 @@ admin.site.register(FriendList, FriendListAdmin)
 
 
 class FriendRequestAdmin(admin.ModelAdmin):
-    list_display        = ["sender", "receiver"]
+    list_display        = ["sender", "receiver", "is_active"]
     list_filter         = ["sender", "receiver"]
     readonly_fields     = ["sender", "receiver"]
     search_fields       = ["sender__emai", "sender__username", "receiver__email", "receiver__username"]

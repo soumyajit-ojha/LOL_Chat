@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 import base64
 
@@ -12,11 +11,14 @@ def fetch_account_details(request, user_id):
     """
     Fetch account details and friend list for the given user ID.
     """
-    account = get_object_or_404(Account, pk=user_id)
     try:
-        friend_list = FriendList.objects.get(user=account)
-    except FriendList.DoesNotExist:
-        friend_list = FriendList.objects.create(user=account)
+        account = Account.objects.get(pk=user_id)
+        try:
+            friend_list = FriendList.objects.get(user=account)
+        except FriendList.DoesNotExist:
+            friend_list = FriendList.objects.create(user=account)
+    except Account.DoesNotExist:
+        account = None
 
     return account, friend_list
 

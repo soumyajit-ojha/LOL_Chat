@@ -6,7 +6,7 @@ function sendFriendRequest(id, uiUpdateFunction) {
 
     $.ajax({
         type: "POST",
-        url: "/friend_request/",
+        url: "/send_friend_request/",
         timeout: 5000,
         data: context,
         success: function (data) {
@@ -15,11 +15,11 @@ function sendFriendRequest(id, uiUpdateFunction) {
                 uiUpdateFunction();
             }
             // Update the button dynamically
-            const sendFriendRequestBtn = document.getElementById("id_send_friend_request_btn");
-            if (sendFriendRequestBtn) {
-                sendFriendRequestBtn.classList.remove("btn-primary");
-                sendFriendRequestBtn.classList.add("btn-danger");
-                sendFriendRequestBtn.textContent = "Cancel Friend Request";
+            const cancelRequestBtn = document.getElementById("id_cancel_friend_request_btn");
+            if (cancelRequestBtn) {
+                cancelRequestBtn.classList.remove("btn-primary");
+                cancelRequestBtn.classList.add("btn-danger");
+                cancelRequestBtn.textContent = "Cancel Friend Request";
 
                 // Update button action to cancel the friend request
                 sendFriendRequestBtn.onclick = function () {
@@ -42,12 +42,15 @@ function cancelFriendRequest(id, uiUpdateFunction) {
 
     $.ajax({
         type: "POST",
-        url: "/friend_request/cancel/", // Adjust URL for cancel endpoint
+        url: "/cancel_friend_request/", // Adjust URL for cancel endpoint
         timeout: 5000,
         data: context,
         success: function (data) {
             console.log(data.message);
             // Revert the button back to "Send Friend Request"
+            if(uiUpdateFunction){
+                uiUpdateFunction();
+            }
             const sendFriendRequestBtn = document.getElementById("id_send_friend_request_btn");
             if (sendFriendRequestBtn) {
                 sendFriendRequestBtn.classList.remove("btn-danger");
